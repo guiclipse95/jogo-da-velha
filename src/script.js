@@ -51,34 +51,72 @@ function clickedBox(element){
     
 }
 
-function bot(runBot){
-        if(runBot){
+function bot(runBot) {
+    if (runBot) {
         let array = [];
-        playerSign = "O";
-        for (let i = 0; i < allBox.length; i++) {
-            if(allBox[i].childElementCount == 0){
-                array.push(i);
+        playerSign = "O"; 
+        
+        
+        function checkForWin(player) {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6]              
+            ];
+
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (allBox[a].id === player && allBox[b].id === player && allBox[c].id === "") {
+                    return c;
+                } else if (allBox[a].id === player && allBox[c].id === player && allBox[b].id === "") {
+                    return b;
+                } else if (allBox[b].id === player && allBox[c].id === player && allBox[a].id === "") {
+                    return a;
+                }
             }
-            
+            return null;
         }
-        let randomBox = array[Math.floor(Math.random() * array.length)];
-        if(array.length > 0){
-            if(players.classList.contains("player")){
+
+        let winningMove = checkForWin("O");
+        if (winningMove !== null) {
+            array.push(winningMove);
+        }
+
+        let blockingMove = checkForWin("X");
+        if (blockingMove !== null) {
+            array.push(blockingMove);
+        }
+
+        if (array.length === 0) {
+            for (let i = 0; i < allBox.length; i++) {
+                if (allBox[i].childElementCount === 0) {
+                    array.push(i);
+                }
+            }
+        }
+
+        if (array.length > 0) {
+            let randomBox = array[Math.floor(Math.random() * array.length)];
+
+            if (players.classList.contains("player")) {
                 playerSign = "X";
                 allBox[randomBox].innerHTML = `<i class="${playerXIcon}"></i>`;
                 players.classList.add("active");
                 allBox[randomBox].setAttribute("id", playerSign);
-            
-            }else{
+            } else {
                 allBox[randomBox].innerHTML = `<i class="${playerOIcon}"></i>`;
                 players.classList.remove("active");
                 allBox[randomBox].setAttribute("id", playerSign);
-            } 
-            selectWinner(); 
+            }
+
+        
+            selectWinner();
         }
+
         allBox[randomBox].style.pointerEvents = "none";
     }
 }
+
 
 function getClass(idname){
     return document.querySelector(".box"+ idname).id;
